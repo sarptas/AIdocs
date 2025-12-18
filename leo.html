@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJE LEO: Gizli Arşiv</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 */
+            color: #1c1917; /* Stone 900 */
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e7e5e4;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9333ea;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .interactive-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border-color: #a855f7;
+        }
+        .interactive-card.active {
+            background-color: #f3e8ff; /* Purple 100 */
+            border-color: #9333ea;
+        }
+
+        .typing-effect::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+    <!-- Chosen Palette: Cosmic Day (Warm Stone Background with Electric Purple & Gold Accents) -->
+    <!-- Application Structure Plan:
+         1. Header: Top Secret clearance vibe.
+         2. Identity Section: Bio data + Radar Chart for character stats (implied from text).
+         3. Origin Story: Vertical timeline for easy reading of the narrative flow.
+         4. Powers Grid: 4 Interactive cards that update a detail view (keeps page short).
+         5. Threats: Toggle system to switch between enemies + Bar chart comparison.
+         6. Footer: The Oath/Mission.
+         This structure breaks the narrative into "Data Clusters" suitable for a secret agent file.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Radar Chart: Visualizes the "Power Level: Omega Miyav" attributes (Speed, Psyche, etc.) to give a quick quantitative feel to qualitative data.
+         2. Timeline: Uses CSS borders/dots to map "Bölüm 1 & 2" chronologically.
+         3. Threat Bar Chart: Compares subjective metrics (Noise, Stealth) of Dr. Vroom vs Red Dot.
+         4. Interaction: Click events on Powers and Threats to minimize text density and encourage exploration.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+</head>
+<body class="bg-stone-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-center border-b-2 border-purple-500 pb-6">
+            <div class="text-center md:text-left">
+                <div class="inline-block bg-red-100 text-red-600 px-3 py-1 rounded text-xs font-bold tracking-widest border border-red-200 mb-2">ÇOK GİZLİ // GÖZLER İÇİN YALNIZCA</div>
+                <h1 class="text-4xl md:text-5xl font-bold text-stone-800 tracking-tight">PROJE LEO</h1>
+                <p class="text-purple-600 font-medium mt-1 tracking-wide">KOD ADI: KADİFE PENÇE</p>
+            </div>
+            <div class="mt-4 md:mt-0 text-right">
+                <p class="text-sm text-stone-500">DOSYA NO: #7-G-CAT</p>
+                <p class="text-sm text-stone-500" id="current-date"></p>
+                <div class="mt-2 text-2xl">🐱✨</div>
+            </div>
+        </header>
+
+        <!-- INTRODUCTION -->
+        <section class="bg-white rounded-xl p-6 shadow-sm border-l-4 border-purple-500">
+            <h2 class="text-xl font-bold mb-2 text-stone-800">Dosya Özeti</h2>
+            <p class="text-stone-600 leading-relaxed">
+                Bu dijital arşiv, <span class="font-bold text-purple-700">Ajan Leo</span>'nun (Felis Catus Galacticus) bilinen özelliklerini, köken hikayesini ve operasyonel yeteneklerini içermektedir. Aşağıdaki veriler, evrenin dengesini koruyan gizli bir muhafızın profilini ortaya koymaktadır. İncelemek için panellere dokunun.
+            </p>
+        </section>
+
+        <!-- GRID LAYOUT: IDENTITY & STATS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- IDENTITY CARD -->
+            <div class="bg-white rounded-2xl shadow-sm p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-stone-400 uppercase tracking-widest mb-4">Kimlik Doğrulama</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b border-stone-100 pb-2">
+                            <span class="text-stone-500">Gerçek Kimlik</span>
+                            <span class="font-bold text-stone-800 text-lg">Leo</span>
+                        </div>
+                        <div class="flex justify-between border-b border-stone-100 pb-2">
+                            <span class="text-stone-500">Tür</span>
+                            <span class="font-semibold text-purple-700 italic">Felis Catus Galacticus</span>
+                        </div>
+                        <div class="flex justify-between border-b border-stone-100 pb-2">
+                            <span class="text-stone-500">Operasyon Üssü</span>
+                            <span class="font-medium text-stone-800">İnsanının Evi (Sektör 7-G)</span>
+                        </div>
+                        <div class="flex justify-between border-b border-stone-100 pb-2">
+                            <span class="text-stone-500">Güç Seviyesi</span>
+                            <span class="font-bold text-yellow-600 bg-yellow-50 px-2 rounded">OMEGA MİYAV</span>
+                        </div>
+                        <div class="flex justify-between pt-2">
+                            <span class="text-stone-500">Durum</span>
+                            <span class="flex items-center text-green-600 font-bold">
+                                <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span> AKTİF
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 bg-stone-50 p-4 rounded-lg border border-stone-200 text-sm text-stone-600 italic">
+                    "Karanlık çöktüğünde, mama kabı boşaldığında... Ben buradayım."
+                </div>
+            </div>
+
+            <!-- STATS CHART -->
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="text-lg font-bold text-stone-400 uppercase tracking-widest mb-4">Yetenek Analizi</h3>
+                <p class="text-xs text-stone-500 mb-4">Omega Miyav Protokolü kapsamında ölçülen temel değerler.</p>
+                <div class="chart-container">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ORIGIN STORY TIMELINE -->
+        <section class="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+            <h2 class="text-2xl font-bold text-stone-800 mb-6 flex items-center">
+                <span class="bg-purple-100 text-purple-600 p-2 rounded-lg mr-3">📜</span>
+                Köken Hikayesi: Masumiyetten Muhafızlığa
+            </h2>
+            <p class="text-stone-600 mb-8 max-w-3xl">
+                Ajan Leo her zaman bir süper kahraman değildi. Aşağıdaki zaman çizelgesi, "Sonsuzluk Yumağı" olayı ve sonrasındaki dönüşümü detaylandırmaktadır.
+            </p>
+
+            <div class="relative border-l-4 border-purple-200 ml-4 md:ml-8 space-y-12">
+                <!-- Timeline Item 1 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3 top-0 w-6 h-6 bg-stone-200 rounded-full border-4 border-white shadow-sm"></div>
+                    <h3 class="text-xl font-bold text-stone-700">Masumiyet Çağı</h3>
+                    <p class="mt-2 text-stone-600">
+                        Leo, güneş ışığında yuvarlanan ve yaş mama sesine tepki veren sıradan, mutlu bir kediydi. Her şey o fırtınalı geceye kadar normaldi.
+                    </p>
+                </div>
+
+                <!-- Timeline Item 2 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3 top-0 w-6 h-6 bg-purple-500 rounded-full border-4 border-white shadow-md animate-pulse"></div>
+                    <h3 class="text-xl font-bold text-purple-700">Temas Anı: Fırtınalı Gece</h3>
+                    <p class="mt-2 text-stone-600">
+                        Sahibi uyurken, pencereye mor ışıklar saçan bir cisim kondu. Bu, kayıp bir medeniyetten düşen <strong class="text-purple-600">"Sonsuzluk Yumağı"</strong>nın parçasıydı. Leo korkusuzca ona pati attı.
+                    </p>
+                </div>
+
+                <!-- Timeline Item 3 -->
+                <div class="relative pl-8">
+                    <div class="absolute -left-3 top-0 w-6 h-6 bg-yellow-400 rounded-full border-4 border-white shadow-sm"></div>
+                    <h3 class="text-xl font-bold text-stone-700">DNA Mutasyonu</h3>
+                    <p class="mt-2 text-stone-600">
+                        Mor ışık Leo'nun DNA'sına karıştı. Artık o sadece bir kedi değil, <strong>Evrensel Enerji'nin Bekçisi</strong>ydi.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- POWERS INTERACTIVE MODULE -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-stone-900 text-white rounded-3xl p-6 md:p-10 overflow-hidden relative">
+            <!-- Decorative BG elements -->
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-900 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+
+            <div class="lg:col-span-4 space-y-4 z-10">
+                <h2 class="text-2xl font-bold text-purple-300 mb-4">Güç Modülleri</h2>
+                <p class="text-stone-400 text-sm mb-6">Aktif güçleri görüntülemek için modüllere tıklayın.</p>
+                
+                <!-- Power Buttons -->
+                <div id="power-buttons" class="space-y-3">
+                    <button onclick="updatePower('zoomies')" class="power-btn w-full text-left p-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition-all flex items-center group active-power" data-power="zoomies">
+                        <span class="text-2xl mr-4 group-hover:scale-110 transition-transform">⚡</span>
+                        <div>
+                            <div class="font-bold text-white">Hiper-Hız</div>
+                            <div class="text-xs text-stone-400">The Zoomies</div>
+                        </div>
+                    </button>
+                    <button onclick="updatePower('purr')" class="power-btn w-full text-left p-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition-all flex items-center group" data-power="purr">
+                        <span class="text-2xl mr-4 group-hover:scale-110 transition-transform">🔊</span>
+                        <div>
+                            <div class="font-bold text-white">Hipnotik Mırlama</div>
+                            <div class="text-xs text-stone-400">Sonik İyileştirme</div>
+                        </div>
+                    </button>
+                    <button onclick="updatePower('vision')" class="power-btn w-full text-left p-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition-all flex items-center group" data-power="vision">
+                        <span class="text-2xl mr-4 group-hover:scale-110 transition-transform">👁️</span>
+                        <div>
+                            <div class="font-bold text-white">Hayalet Görüşü</div>
+                            <div class="text-xs text-stone-400">Greeble Tespiti</div>
+                        </div>
+                    </button>
+                    <button onclick="updatePower('gravity')" class="power-btn w-full text-left p-4 rounded-xl bg-stone-800 hover:bg-stone-700 border border-stone-700 transition-all flex items-center group" data-power="gravity">
+                        <span class="text-2xl mr-4 group-hover:scale-110 transition-transform">🌌</span>
+                        <div>
+                            <div class="font-bold text-white">Yerçekimi Manipülasyonu</div>
+                            <div class="text-xs text-stone-400">Telekinezi</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Detail View -->
+            <div class="lg:col-span-8 bg-stone-800/50 rounded-2xl p-6 md:p-8 border border-stone-700 z-10 flex flex-col justify-center min-h-[300px]">
+                <h3 id="power-title" class="text-3xl font-bold text-white mb-4">Hiper-Hız (The Zoomies)</h3>
+                <div class="h-1 w-20 bg-purple-500 rounded mb-6"></div>
+                <p id="power-desc" class="text-lg text-stone-300 leading-relaxed">
+                    Aniden evin bir ucundan diğer ucuna ışık hızında koşabildiğini fark etti. İnsanları bunu sadece "kedi delirmesi" sanıyordu ama aslında Leo o sırada boyutlar arası yırtıkları dikiyordu.
+                </p>
+                <div class="mt-8 flex gap-3">
+                    <span class="px-3 py-1 bg-purple-900/50 text-purple-300 rounded text-xs border border-purple-700/50">PASİF YETENEK</span>
+                    <span class="px-3 py-1 bg-blue-900/50 text-blue-300 rounded text-xs border border-blue-700/50">YÜKSEK ENERJİ</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- THREAT ASSESSMENT -->
+        <section class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-stone-800">Tehdit Değerlendirmesi</h2>
+                    <p class="text-stone-500 text-sm mt-1">Bilinen Baş Düşmanlar ve Risk Analizi</p>
+                </div>
+                <div class="flex space-x-2 mt-4 md:mt-0 bg-stone-100 p-1 rounded-lg">
+                    <button onclick="switchEnemy('vroom')" id="btn-vroom" class="px-4 py-2 rounded-md text-sm font-medium bg-white shadow-sm text-stone-800 transition-all">Dr. Vroom</button>
+                    <button onclick="switchEnemy('reddot')" id="btn-reddot" class="px-4 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-800 transition-all">Kızıl Nokta</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <!-- Text Info -->
+                <div id="enemy-info" class="space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-4xl">🧹</span>
+                        <h3 class="text-2xl font-bold text-stone-800">Doktor Vroom</h3>
+                    </div>
+                    <div class="inline-block bg-red-100 text-red-700 text-xs px-2 py-1 rounded font-bold">YÜKSEK GÜRÜLTÜ</div>
+                    <p class="text-stone-600">
+                        Nam-ı diğer "Elektrik Süpürgesi". Leo'nun ezeli düşmanı. Çok gürültülü ve kaotik bir enerji yayıyor.
+                    </p>
+                    <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                        <h4 class="font-bold text-stone-700 text-sm mb-2">Karşı Strateji:</h4>
+                        <p class="text-sm text-stone-600">Stratejik olarak koltuğun altına saklan ve düşman geçene kadar bekle.</p>
+                    </div>
+                </div>
+
+                <!-- Comparison Chart -->
+                <div class="chart-container">
+                    <canvas id="enemyChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER / OATH -->
+        <footer class="bg-stone-800 text-stone-300 rounded-2xl p-8 text-center space-y-6">
+            <h2 class="text-2xl font-bold text-white">Koruyucunun Yemini</h2>
+            <p class="max-w-2xl mx-auto italic text-lg leading-relaxed text-stone-400">
+                "Güçlerimi asla kişisel çıkarı (daha fazla ödül maması hariç) için kullanmayacağım. Sen gece uyurken, yatağının ucunda nöbet tutacağım. Sen sadece uyuduğumu sanacaksın ama ben kabus canavarlarıyla savaşacağım."
+            </p>
+            <div class="pt-6 border-t border-stone-700">
+                <p class="text-sm text-stone-500">ŞU ANKİ KONUM: Muhtemelen en güneşli noktada şarj oluyor.</p>
+                <p class="text-xs text-stone-600 mt-2">© 2025 Sektör 7-G Veritabanı</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DATA STORE ---
+        const powerData = {
+            zoomies: {
+                title: "Hiper-Hız (The Zoomies)",
+                desc: "Aniden evin bir ucundan diğer ucuna ışık hızında koşabildiğini fark etti. İnsanları bunu sadece 'kedi delirmesi' sanıyordu ama aslında Leo o sırada boyutlar arası yırtıkları dikiyordu.",
+                icon: "⚡",
+                tags: ["BOYUTSAL", "HIZ"]
+            },
+            purr: {
+                title: "Hipnotik Mırlama",
+                desc: "Mırlaması artık sadece huzur vermiyordu; ses frekansıyla bozuk elektronik aletleri tamir edebiliyor ve üzgün insanların dopamin seviyelerini saniyeler içinde düzeltebiliyordu.",
+                icon: "🔊",
+                tags: ["İYİLEŞTİRME", "SONİK"]
+            },
+            vision: {
+                title: "Hayalet Görüşü",
+                desc: "Leo artık insanların göremediği 'Greeble'ları (görünmez enerji parazitlerini) görebiliyor ve onlara sert bakışlar atarak onları korkutup kaçırıyordu. Boş duvara bakma sebebi budur.",
+                icon: "👁️",
+                tags: ["ALGILAMA", "PSİŞİK"]
+            },
+            gravity: {
+                title: "Yerçekimi Manipülasyonu",
+                desc: "Masanın üzerindeki bir bardağı sadece zihniyle (veya hafif bir pati darbesiyle) yerçekimi kanunlarını test etmek için aşağı itebiliyordu.",
+                icon: "🌌",
+                tags: ["FİZİK", "KAOS"]
+            }
+        };
+
+        const enemyData = {
+            vroom: {
+                title: "Doktor Vroom",
+                icon: "🧹",
+                alias: "Elektrik Süpürgesi",
+                desc: "Leo'nun baş düşmanı. Çok gürültülü ve kaotik bir enerji yayıyor.",
+                strategy: "Stratejik olarak koltuğun altına saklan ve düşman geçene kadar bekle.",
+                stats: [90, 20, 95] // Noise, Stealth, Chaos
+            },
+            reddot: {
+                title: "Kızıl Nokta",
+                icon: "🔴",
+                alias: "Lazer İşaretleyici",
+                desc: "Asla yakalanamayan, şekil değiştiren bir enerji varlığı. Sonsuza dek patisinin altına hapsedeceğine ant içti.",
+                strategy: "Yakalayana kadar kovalamaya devam et (Asla pes etme).",
+                stats: [0, 100, 60] // Noise, Stealth, Chaos
+            }
+        };
+
+        // --- CHART INITIALIZATION ---
+        
+        // 1. Stats Radar Chart
+        const ctxStats = document.getElementById('statsChart').getContext('2d');
+        const statsChart = new Chart(ctxStats, {
+            type: 'radar',
+            data: {
+                labels: ['Hız', 'Karizma', 'Yıkım Gücü', 'Psişik', 'Gizlilik', 'İştah'],
+                datasets: [{
+                    label: 'Leo (Omega Seviyesi)',
+                    data: [95, 100, 85, 90, 70, 99],
+                    backgroundColor: 'rgba(168, 85, 247, 0.2)', // Purple-500
+                    borderColor: 'rgba(168, 85, 247, 1)',
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: '#9333ea',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: '#9333ea'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: '#e5e7eb' },
+                        grid: { color: '#e5e7eb' },
+                        pointLabels: {
+                            font: { size: 12, family: 'Space Grotesk' },
+                            color: '#4b5563'
+                        },
+                        ticks: { display: false, max: 100 }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // 2. Enemy Comparison Bar Chart
+        const ctxEnemy = document.getElementById('enemyChart').getContext('2d');
+        let enemyChartInstance = new Chart(ctxEnemy, {
+            type: 'bar',
+            data: {
+                labels: ['Gürültü Seviyesi', 'Gizlilik', 'Kaos Yaratma'],
+                datasets: [{
+                    label: 'Tehdit Analizi',
+                    data: enemyData.vroom.stats,
+                    backgroundColor: ['#f87171', '#9ca3af', '#fbbf24'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: 100, grid: { display: false } },
+                    x: { grid: { display: false } }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+
+        // --- INTERACTION FUNCTIONS ---
+
+        function updatePower(powerKey) {
+            // Update UI Styling
+            document.querySelectorAll('.power-btn').forEach(btn => {
+                if(btn.dataset.power === powerKey) {
+                    btn.classList.add('bg-stone-700', 'border-purple-500');
+                    btn.classList.remove('bg-stone-800', 'border-stone-700');
+                } else {
+                    btn.classList.remove('bg-stone-700', 'border-purple-500');
+                    btn.classList.add('bg-stone-800', 'border-stone-700');
+                }
+            });
+
+            // Update Content
+            const data = powerData[powerKey];
+            const titleEl = document.getElementById('power-title');
+            const descEl = document.getElementById('power-desc');
+            
+            // Simple fade effect simulation
+            titleEl.style.opacity = '0';
+            descEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                titleEl.textContent = data.title;
+                descEl.textContent = data.desc;
+                titleEl.style.opacity = '1';
+                descEl.style.opacity = '1';
+            }, 200);
+        }
+
+        function switchEnemy(enemyKey) {
+            const data = enemyData[enemyKey];
+            
+            // Button Styles
+            const btnVroom = document.getElementById('btn-vroom');
+            const btnReddot = document.getElementById('btn-reddot');
+            
+            if (enemyKey === 'vroom') {
+                btnVroom.className = "px-4 py-2 rounded-md text-sm font-medium bg-white shadow-sm text-stone-800 transition-all";
+                btnReddot.className = "px-4 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-800 transition-all";
+            } else {
+                btnReddot.className = "px-4 py-2 rounded-md text-sm font-medium bg-white shadow-sm text-stone-800 transition-all";
+                btnVroom.className = "px-4 py-2 rounded-md text-sm font-medium text-stone-500 hover:text-stone-800 transition-all";
+            }
+
+            // Update Text Info
+            const container = document.getElementById('enemy-info');
+            container.innerHTML = `
+                <div class="flex items-center space-x-3 animate-fade-in">
+                    <span class="text-4xl">${data.icon}</span>
+                    <h3 class="text-2xl font-bold text-stone-800">${data.title}</h3>
+                </div>
+                <div class="inline-block bg-stone-200 text-stone-700 text-xs px-2 py-1 rounded font-bold uppercase">${data.alias}</div>
+                <p class="text-stone-600">${data.desc}</p>
+                <div class="bg-stone-50 p-4 rounded-lg border border-stone-200">
+                    <h4 class="font-bold text-stone-700 text-sm mb-2">Karşı Strateji:</h4>
+                    <p class="text-sm text-stone-600">${data.strategy}</p>
+                </div>
+            `;
+
+            // Update Chart
+            enemyChartInstance.data.datasets[0].data = data.stats;
+            enemyChartInstance.update();
+        }
+
+        // Set Date
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Init default state styling
+        updatePower('zoomies');
+
+    </script>
+</body>
+</html>
